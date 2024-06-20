@@ -20,6 +20,7 @@ from pyspark.sql import functions as F
 from pyspark.sql.types import *
 from databricks.sdk.runtime import *
 
+import os
 
 # COMMAND ----------
 
@@ -29,6 +30,13 @@ fyear = year * 100 + ((year + 1) % 100)
 filepath = "/Volumes/su_data/default/hes_raw/apc/"
 filename = f"{filepath}/apc_{year}99.csv.gz"
 dismeth_file = None
+
+savepath = f"/Volumes/hes/bronze/raw/apc/fyear={fyear}"
+
+# COMMAND ----------
+
+if os.path.exists(savepath):
+    dbutils.notebook.exit("data already exists: skipping")
 
 # COMMAND ----------
 
@@ -423,7 +431,7 @@ if year in [2019, 2020]:
     .repartition(32)
     .write
     .mode("overwrite")
-    .parquet(f"/Volumes/hes/bronze/raw/apc/fyear={fyear}")
+    .parquet(savepath)
 )
 
 # COMMAND ----------
@@ -452,15 +460,3 @@ if year in [2019, 2020]:
 # COMMAND ----------
 
 spark.table("hes.bronze.apc").filter(F.col("fyear") == fyear).count()
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC
-# MAGIC [disabled cell]
-# MAGIC
-# MAGIC ``` py
-# MAGIC dbutils.fs.rm(filename, True)
-# MAGIC if dismeth_file:
-# MAGIC     dbutils.fs.rm(dismeth_file)
-# MAGIC ```
