@@ -8,15 +8,26 @@
 
 # COMMAND ----------
 
-from functools import reduce
 from pyspark.sql.types import *
 from pyspark.sql import functions as F
 from databricks.sdk.runtime import *
+
+from functools import reduce
+import os
 
 # COMMAND ----------
 
 year = int(dbutils.widgets.get("year"))
 fyear = year * 100 + ((year + 1) % 100)
+
+filepath = "/Volumes/su_data/default/nhp_hes_apc/"
+
+savepath = f"/Volumes/hes/bronze/raw/apc/fyear={fyear}"
+
+# COMMAND ----------
+
+if os.path.exists(savepath):
+    dbutils.notebook.exit("data already exists: skipping")
 
 # COMMAND ----------
 
@@ -27,7 +38,7 @@ fyear = year * 100 + ((year + 1) % 100)
 
 df = (
     spark.read
-    .parquet("/Volumes/su_data/default/nhp_hes_apc/")
+    .parquet(filepath)
     .filter(F.col("fyear") == (fyear % 10000))
 )
 # convert all column names to lower case
@@ -112,5 +123,5 @@ df = reduce(
     .repartition(32)
     .write
     .mode("overwrite")
-    .parquet(f"/Volumes/hes/bronze/raw/apc/fyear={fyear}")
+    .parquet(savepath)
 )
