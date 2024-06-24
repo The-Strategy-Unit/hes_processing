@@ -11,6 +11,8 @@ from pyspark.sql import DataFrame
 
 from databricks.sdk.runtime import *
 
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC
 # MAGIC ## Compare to HES Summary Statistics
@@ -20,8 +22,8 @@ from databricks.sdk.runtime import *
 # MAGIC Note, that these files suppress data by replacing counts less than 5
 # MAGIC with a *, and then rounding all other values to the nearest 5.
 
-
 # COMMAND ----------
+
 fce = (
     spark.read.table("hes.silver.apc")
     .filter(F.col("fce") == True)
@@ -60,15 +62,15 @@ fae_by_group = (
     .sort(["procode3", "fyear"])
 ).display()
 
+# COMMAND ----------
+
 # MAGIC %md
-# MAGIC
 # MAGIC ## Check our last episode in spell column
 # MAGIC
 # MAGIC The following produces counts by last episode in spell. It should be
 # MAGIC close to the prior counts, but those counts are based on the end date of
 # MAGIC the admitting episode. This is based on the end date of the discharging
 # MAGIC episode.
-
 
 # COMMAND ----------
 
