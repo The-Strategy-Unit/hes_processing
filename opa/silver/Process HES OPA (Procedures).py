@@ -17,7 +17,7 @@ dfs = [
     (
         df
         .select(
-            "epikey",
+            "attendkey",
             "fyear",
             "procode3",
             F.col(f"opdate_{i:02}").alias("date"),
