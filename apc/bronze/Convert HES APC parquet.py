@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Convert HES APC CSV to parquet
+# MAGIC # Convert HES APC parquet files
 # MAGIC
 # MAGIC This notebook is to convert the raw parquet Admitted Patient Care (APC) Hospital Episode Statistics (HES) files supplied by NHS England.
 # MAGIC
