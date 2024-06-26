@@ -32,7 +32,13 @@ opertn_df = reduce(lambda df1, df2: df1.unionByName(df2), dfs)
 
 # COMMAND ----------
 
-opertn_df = fix_icd10_or_opcs4(opertn_df, "procedure_code")
+opertn_df = fix_icd10_or_opcs4(
+    opertn_df
+        .filter( F.col("procedure_code").rlike("^[A-Z]\\d{3}$"))
+        .filter(~F.col("procedure_code").rlike("^X99")),
+    "procedure_code"
+)
+
 
 # COMMAND ----------
 
