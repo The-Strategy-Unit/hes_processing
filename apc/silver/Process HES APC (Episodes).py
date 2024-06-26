@@ -134,14 +134,6 @@ df = (
 
 # COMMAND ----------
 
-df.filter(F.col("procode3") == "RNA").filter(F.col("last_episode_in_spell")).groupBy("fyear").count().sort("fyear").display()
-
-# COMMAND ----------
-
-display(df.filter(F.col("last_episode_in_spell")).groupBy("procode3").pivot("fyear").count())
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC ## Save Results
 
