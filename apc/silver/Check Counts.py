@@ -24,6 +24,8 @@ from databricks.sdk.runtime import *
 
 # COMMAND ----------
 
+admimeth = F.col("admimeth")
+
 fce = (
     spark.read.table("hes.silver.apc")
     .filter(F.col("fce") == True)
@@ -73,8 +75,6 @@ fae_by_group = (
 # MAGIC episode.
 
 # COMMAND ----------
-
-admimeth = F.col("admimeth")
 
 df = (
     spark.read.table("hes.silver.apc")
