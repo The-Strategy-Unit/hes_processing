@@ -20,7 +20,6 @@ dfs = [
             "attendkey",
             "fyear",
             "procode3",
-            F.col(f"opdate_{i:02}").alias("date"),
             F.col(f"opertn_{i:02}").alias("procedure_code")
         )
         .filter(F.col(f"opertn_{i:02}").isNotNull())
