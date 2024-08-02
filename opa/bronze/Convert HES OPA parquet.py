@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # Convert HES OPA to parquet
 # MAGIC
-# MAGIC This notebook is to convert the raw parquet Admitted Patient Care (APC) Hospital Episode Statistics (HES) files supplied by NHS England.
+# MAGIC This notebook is to convert the raw parquet Outpatient Activity (OPA) Hospital Episode Statistics (HES) files supplied by NHS England.
 # MAGIC
 # MAGIC Once this has run, the parquet files will form the bronze level data, and the parquet files could be removed.
 
