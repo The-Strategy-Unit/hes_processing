@@ -24,6 +24,7 @@ dfs = [
             F.col(f"opertn_{i:02}").alias("procedure_code")
         )
         .filter(F.col(f"opertn_{i:02}").isNotNull())
+        .filter(F.col(f"opertn_{i:02}").rlike("^[A-Z]"))
         .withColumn("procedure_order", F.lit(i))
     )
     for i in range(1, 25)
