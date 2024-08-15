@@ -107,6 +107,8 @@ w = (
 last_episode_in_spell = (
     df
     .filter(F.col("fce") == 1)
+    .filter(F.col("dismeth") != "8")
+    .filter(F.col("disdate").isNotNull())
     .filter(~F.col("classpat").isin(["3", "4"]))
     .withColumn(
         "p_rev_spell_epiorder",
