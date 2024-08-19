@@ -107,6 +107,9 @@ w = (
 last_episode_in_spell = (
     df
     .filter(F.col("fce") == 1)
+    .filter(F.col("person_id_deid").isNotNull())
+    .filter(F.col("provspnops").isNotNull())
+    .filter(F.col("admidate").isNotNull())
     .filter(F.col("dismeth") != "8")
     .filter(F.col("disdate").isNotNull())
     .filter(~F.col("classpat").isin(["3", "4"]))
@@ -126,12 +129,6 @@ df = (
     df
     .join(last_episode_in_spell, "epikey", "left")
     .na.fill(False, ["last_episode_in_spell"])
-    # .withColumn(
-    #     "last_episode_in_spell",
-    #     F
-    #         .when(F.col("classpat").isin(["3", "4"]), F.lit(True))
-    #         .otherwise(F.col("last_episode_in_spell"))
-    # )
 )
 
 # COMMAND ----------
