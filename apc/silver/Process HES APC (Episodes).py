@@ -126,12 +126,12 @@ df = (
     df
     .join(last_episode_in_spell, "epikey", "left")
     .na.fill(False, ["last_episode_in_spell"])
-    .withColumn(
-        "last_episode_in_spell",
-        F
-            .when(F.col("classpat").isin(["3", "4"]), F.lit(True))
-            .otherwise(F.col("last_episode_in_spell"))
-    )
+    # .withColumn(
+    #     "last_episode_in_spell",
+    #     F
+    #         .when(F.col("classpat").isin(["3", "4"]), F.lit(True))
+    #         .otherwise(F.col("last_episode_in_spell"))
+    # )
 )
 
 # COMMAND ----------
