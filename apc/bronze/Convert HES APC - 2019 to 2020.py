@@ -406,16 +406,15 @@ df = (
 
 # COMMAND ----------
 
-if year in [2019, 2020]:
-    dismeth_file = f"{filepath}/apc_{year}99_dismeth.csv.gz"
-    dismeth = (
-        spark.read.option("header", "true")
-        .option("delimiter", ",")
-        .csv(dismeth_file)
-        .select("epikey", "dismeth")
-    )
+dismeth_file = f"{filepath}/apc_{year}99_dismeth.csv.gz"
+dismeth = (
+    spark.read.option("header", "true")
+    .option("delimiter", ",")
+    .csv(dismeth_file)
+    .select("epikey", "dismeth")
+)
 
-    df = df.join(dismeth, "epikey", "left")
+df = df.join(dismeth, "epikey", "left")
 
 # COMMAND ----------
 
