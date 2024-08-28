@@ -432,30 +432,3 @@ df = df.join(dismeth, "epikey", "left")
     .mode("overwrite")
     .parquet(savepath)
 )
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC remove the csv file which is no longer needed
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC # Create view if it doesn't exist
-# MAGIC
-# MAGIC Create the bronze view to the data.
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC
-# MAGIC CREATE VIEW IF NOT EXISTS hes.bronze.apc AS SELECT * FROM PARQUET.`/Volumes/hes/bronze/raw/apc`;
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC # Verify data load
-
-# COMMAND ----------
-
-spark.table("hes.bronze.apc").filter(F.col("fyear") == fyear).count()
