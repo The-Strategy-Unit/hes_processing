@@ -407,7 +407,7 @@ df = (
 
 mpsid = (
     spark.read.parquet(mpsid_file)
-    .withColumnRenamed("token_id", "person_id_deid")
+    .withColumnRenamed("tokenid", "person_id_deid")
 )
 
 df = df.join(mpsid, "epikey", "left")
