@@ -28,8 +28,8 @@ year = int(dbutils.widgets.get("year"))
 fyear = year * 100 + ((year + 1) % 100)
 
 filepath = "/Volumes/su_data/default/hes_raw/apc/"
-filename = f"{filepath}/apc_{year}99.csv.gz"
-mpsid_file = f"{filepath}/apc_{year}99_mpsid.parquet"
+filename = f"{filepath}/apc_{fyear}.txt.gz"
+mpsid_file = f"{filepath}/apc_{fyear}_mpsid.parquet"
 
 savepath = f"/Volumes/hes/bronze/raw/apc/fyear={fyear}"
 
@@ -392,9 +392,10 @@ csv_schema = StructType([
 
 df = (
     spark.read.option("header", "true")
-    .option("delimiter", ",")
+    .option("delimiter", "|")
     .schema(csv_schema)
     .csv(filename)
+    .drop("fyear")
 )
 
 # COMMAND ----------

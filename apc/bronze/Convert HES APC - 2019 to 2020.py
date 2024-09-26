@@ -28,8 +28,8 @@ year = int(dbutils.widgets.get("year"))
 fyear = year * 100 + ((year + 1) % 100)
 
 filepath = "/Volumes/su_data/default/hes_raw/apc/"
-filename = f"{filepath}/apc_{year}99.csv.gz"
-dismeth_file = None
+filename = f"{filepath}/apc_{fyear}.csv.gz"
+dismeth_file = f"{filepath}/apc_{fyear}_dismeth.csv.gz"
 
 savepath = f"/Volumes/hes/bronze/raw/apc/fyear={fyear}"
 
@@ -406,7 +406,6 @@ df = (
 
 # COMMAND ----------
 
-dismeth_file = f"{filepath}/apc_{year}99_dismeth.csv.gz"
 dismeth = (
     spark.read.option("header", "true")
     .option("delimiter", ",")
