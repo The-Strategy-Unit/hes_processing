@@ -21,7 +21,7 @@ def open_comorbidity_file(file, scores):
                 for c in v["codes"]
                 for s in scores
             ])
-            .withColumn("type", file)
+            .withColumn("type", F.lit(file))
         )
 
 comorbidities = reduce(
