@@ -100,19 +100,18 @@ df = df.drop(*[i for i in df.columns if i.startswith("imd")])
 
 w = (
     Window
-    .partitionBy(["person_id_deid", "admidate", "procode3", "provspnops"])
+    .partitionBy(["susspellid"])
     .orderBy(F.desc("epistart"), F.desc("epiorder"), F.desc("epiend"), F.desc("epikey"))
 )
 
 last_episode_in_spell = (
     df
     .filter(F.col("fce") == 1)
-    .filter(F.col("person_id_deid").isNotNull())
-    .filter(F.col("provspnops").isNotNull())
     .filter(F.col("admidate").isNotNull())
     .filter(F.col("dismeth") != "8")
     .filter(F.col("disdate").isNotNull())
-    .filter(~F.col("classpat").isin(["3", "4"]))
+    .filter(F.col("susspellid") != "-1")
+    .filter(F.col("susspellid").isNotNull())
     .withColumn(
         "p_rev_spell_epiorder",
         F.row_number().over(w)
