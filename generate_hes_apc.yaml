@@ -1,0 +1,125 @@
+resources:
+  jobs:
+    Process_HES_APC:
+      name: Process HES APC
+      email_notifications:
+        no_alert_for_skipped_runs: true
+      webhook_notifications:
+        on_success:
+          - id: 11be34cb-f1f0-42ca-99d8-e7b3e75e20ca
+        on_failure:
+          - id: 11be34cb-f1f0-42ca-99d8-e7b3e75e20ca
+      notification_settings:
+        no_alert_for_skipped_runs: true
+        no_alert_for_canceled_runs: true
+      tasks:
+        - task_key: Bronze-201516-201819
+          for_each_task:
+            inputs: "[2015, 2016, 2017, 2018]"
+            task:
+              task_key: Bronze-201516-201819_iteration
+              notebook_task:
+                notebook_path: apc/bronze/Convert HES APC - 2015 to 2018
+                base_parameters:
+                  year: "{{input}}"
+                source: GIT
+              job_cluster_key: nhp_job_cluster
+        - task_key: Bronze-201920-202021
+          for_each_task:
+            inputs: "[2019, 2020]"
+            task:
+              task_key: Bronze-201920-202021_iteration
+              notebook_task:
+                notebook_path: apc/bronze/Convert HES APC - 2019 to 2020
+                base_parameters:
+                  year: "{{input}}"
+                source: GIT
+              job_cluster_key: nhp_job_cluster
+        - task_key: Bronze-202122-202223
+          for_each_task:
+            inputs: "[2021, 2022]"
+            task:
+              task_key: Bronze-202122-202223_iteration
+              notebook_task:
+                notebook_path: apc/bronze/Convert HES APC - 2021 to 2022
+                base_parameters:
+                  year: "{{input}}"
+                source: GIT
+              job_cluster_key: nhp_job_cluster
+        - task_key: Create-Bronze-View
+          depends_on:
+            - task_key: Bronze-201920-202021
+            - task_key: Bronze-202122-202223
+            - task_key: Bronze-201516-201819
+          notebook_task:
+            notebook_path: apc/bronze/Create Bronze View
+            source: GIT
+          job_cluster_key: nhp_job_cluster
+        - task_key: Silver-Episodes
+          depends_on:
+            - task_key: Create-Bronze-View
+          notebook_task:
+            notebook_path: apc/silver/Process HES APC (Episodes)
+            source: GIT
+          job_cluster_key: nhp_job_cluster
+        - task_key: Silver-Births
+          depends_on:
+            - task_key: Silver-Episodes
+          notebook_task:
+            notebook_path: apc/silver/Process HES APC (Births)
+            source: GIT
+          job_cluster_key: nhp_job_cluster
+        - task_key: Silver-Comorbidities
+          depends_on:
+            - task_key: Silver-Episodes
+          notebook_task:
+            notebook_path: apc/silver/Process HES APC (Comorbidities)
+            source: GIT
+          job_cluster_key: nhp_job_cluster
+        - task_key: Silver-Diagnoses
+          depends_on:
+            - task_key: Silver-Episodes
+          notebook_task:
+            notebook_path: apc/silver/Process HES APC (Diagnoses)
+            source: GIT
+          job_cluster_key: nhp_job_cluster
+        - task_key: Silver-Procedures
+          depends_on:
+            - task_key: Silver-Episodes
+          notebook_task:
+            notebook_path: apc/silver/Process HES APC (Procedures)
+            source: GIT
+          job_cluster_key: nhp_job_cluster
+        - task_key: Silver-check_counts
+          depends_on:
+            - task_key: Silver-Diagnoses
+            - task_key: Silver-Episodes
+            - task_key: Silver-Comorbidities
+            - task_key: Silver-Births
+            - task_key: Silver-Procedures
+          notebook_task:
+            notebook_path: apc/silver/Check Counts
+            source: GIT
+          job_cluster_key: nhp_job_cluster
+      job_clusters:
+        - job_cluster_key: nhp_job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: 14.3.x-scala2.12
+            azure_attributes:
+              first_on_demand: 1
+              availability: SPOT_WITH_FALLBACK_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_D8ads_v5
+            enable_elastic_disk: true
+            data_security_mode: SINGLE_USER
+            runtime_engine: STANDARD
+            autoscale:
+              min_workers: 2
+              max_workers: 8
+      git_source:
+        git_url: https://github.com/The-Strategy-Unit/hes_processing
+        git_provider: gitHub
+        git_branch: main
+      queue:
+        enabled: true
