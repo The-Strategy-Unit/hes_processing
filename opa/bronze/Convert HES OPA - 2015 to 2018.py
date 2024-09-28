@@ -241,6 +241,7 @@ df = (
 
 df = df.drop("fyear", "1stoperation")
 
+# COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Add new person id
