@@ -106,7 +106,7 @@ w = (
 
 last_episode_in_spell = (
     df
-    .filter(F.col("fce") == 1)
+    .filter(F.col("epistat") == 3)
     .filter(F.col("admidate").isNotNull())
     .filter(F.col("dismeth") != "8")
     .filter(F.col("disdate").isNotNull())
