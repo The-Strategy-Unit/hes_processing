@@ -413,6 +413,18 @@ mpsid = (
 
 df = df.join(mpsid, "epikey", "left")
 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Fix well_baby_ind
+# MAGIC
+# MAGIC values of 0 should be N, and 1 should be Y
+
+# COMMAND ----------
+
+df = df.withColumn("well_baby_ind", F.when(F.col("well_baby_ind") == "1", "Y").otherwise("N"))
+
 # COMMAND ----------
 
 # MAGIC %md
