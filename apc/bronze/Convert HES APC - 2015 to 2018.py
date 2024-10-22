@@ -28,7 +28,7 @@ year = int(dbutils.widgets.get("year"))
 fyear = year * 100 + ((year + 1) % 100)
 
 filepath = "/Volumes/su_data/default/hes_raw/apc/"
-filename = f"{filepath}/apc_{fyear}.txt.gz"
+filename = f"{filepath}/apc_{fyear}"
 mpsid_file = f"{filepath}/apc_{fyear}_mpsid.parquet"
 
 savepath = f"/Volumes/hes/bronze/raw/apc/fyear={fyear}"
@@ -213,6 +213,7 @@ csv_schema = StructType([
     StructField('fce', IntegerType(), True),
     StructField('fde', IntegerType(), True),
     StructField('firstreg', StringType(), True),
+    StructField('fyear', StringType(), True),
     StructField('gestat_1', IntegerType(), True),
     StructField('gestat_2', IntegerType(), True),
     StructField('gestat_3', IntegerType(), True),
@@ -391,11 +392,13 @@ csv_schema = StructType([
 # COMMAND ----------
 
 df = (
-    spark.read.option("header", "true")
-    .option("delimiter", "|")
-    .schema(csv_schema)
-    .csv(filename)
-    .drop("fyear")
+    spark.read
+    .csv(
+        filename,
+        header=False,
+        schema=csv_schema,
+        sep="|"
+    )
 )
 
 # COMMAND ----------
@@ -412,18 +415,6 @@ mpsid = (
 )
 
 df = df.join(mpsid, "epikey", "left")
-
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Fix well_baby_ind
-# MAGIC
-# MAGIC values of 0 should be N, and 1 should be Y
-
-# COMMAND ----------
-
-df = df.withColumn("well_baby_ind", F.when(F.col("well_baby_ind") == "1", "Y").otherwise("N"))
 
 # COMMAND ----------
 
