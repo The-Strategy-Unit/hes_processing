@@ -272,7 +272,7 @@ mpsid = (
     .withColumnRenamed("tokenid", "person_id_deid")
 )
 
-df = df.join(mpsid, "epikey", "left")
+df = df.join(mpsid, "aekey", "left")
 
 
 # COMMAND ----------
