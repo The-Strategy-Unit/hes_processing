@@ -10,7 +10,7 @@ def _load_apc_csv_data(spark: SparkContext, year: int) -> None:
     filepath = "/Volumes/su_data/default/hes_raw/apc/"
     filename = f"{filepath}/apc_{fyear}"
 
-    csv_schema = columns[fyear]
+    csv_schema = columns[year]
     
     df: DataFrame = (
         spark.read

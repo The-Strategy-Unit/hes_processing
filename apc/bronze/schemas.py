@@ -913,7 +913,7 @@ for i in range(1989, 1997):
         "susrecid",
         "epikey",
     ]
-    columns[i] = T.StructField([cols[c] for c in cols])
+    columns[i] = T.StructType([T.StructField(c, all_columns[c], True) for c in cols])
 # 1997/98 to 2012/13
 for i in range(1997, 2013):
     cols = [
@@ -1333,7 +1333,7 @@ for i in range(1997, 2013):
         "susrecid",
         "epikey",
     ]
-    columns[i] = T.StructField([cols[c] for c in cols])
+    columns[i] = T.StructType([T.StructField(c, all_columns[c], True) for c in cols])
 
 # 2013/14 to 2014/15
 for i in range(2013, 2015):
@@ -1757,11 +1757,11 @@ for i in range(2013, 2015):
         "lsoa01",
         "msoa01",
     ]
-    columns[i] = T.StructField([cols[c] for c in cols])
+    columns[i] = T.StructType([T.StructField(c, all_columns[c], True) for c in cols])
 
 # 2015/16 to 2018/19
 for i in range(2015, 2019):
-    cols[i] = [
+    cols = [
         "acscflag",
         "activage",
         "admiage",
@@ -2098,7 +2098,7 @@ for i in range(2015, 2019):
         "waitlist",
         "well_baby_ind",
     ]
-    columns[i] = T.StructField([cols[c] for c in cols])
+    columns[i] = T.StructType([T.StructField(c, all_columns[c], True) for c in cols])
 
 # 2019/20 to 2020/21
 for i in range(2019, 2021):
@@ -2438,4 +2438,4 @@ for i in range(2019, 2021):
         "waitlist",
         "well_baby_ind",
     ]
-    columns[i] = T.StructField([cols[c] for c in cols])
+    columns[i] = T.StructType([T.StructField(c, all_columns[c], True) for c in cols])
