@@ -13,82 +13,20 @@ resources:
         no_alert_for_skipped_runs: true
         no_alert_for_canceled_runs: true
       tasks:
-        - task_key: Bronze-198990-199697
+        - task_key: Bronze-loop
           for_each_task:
-            inputs: "[1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996]"
+            inputs: "{{job.parameters.bronze_years}}"
             task:
-              task_key: Bronze-198990-199697_iteration
-              notebook_task:
-                notebook_path: apc/bronze/Convert HES APC - 1989 to 1996
-                base_parameters:
-                  year: "{{input}}"
-                source: GIT
-              job_cluster_key: nhp_job_cluster
-        - task_key: Bronze-199798-201213
-          for_each_task:
-            inputs:
-              "[1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-              2008, 2009, 2010, 2011, 2012]"
-            task:
-              task_key: Bronze-199798-201213_iteration
-              notebook_task:
-                notebook_path: apc/bronze/Convert HES APC - 1997 to 2012
-                base_parameters:
-                  year: "{{input}}"
-                source: GIT
-              job_cluster_key: nhp_job_cluster
-        - task_key: Bronze-201314-201415
-          for_each_task:
-            inputs: "[2013, 2014]"
-            task:
-              task_key: Bronze-201314-201415_iteration
-              notebook_task:
-                notebook_path: apc/bronze/Convert HES APC - 2013 to 2014
-                base_parameters:
-                  year: "{{input}}"
-                source: GIT
-              job_cluster_key: nhp_job_cluster
-        - task_key: Bronze-201516-201819
-          for_each_task:
-            inputs: "[2015, 2016, 2017, 2018]"
-            task:
-              task_key: Bronze-201516-201819_iteration
-              notebook_task:
-                notebook_path: apc/bronze/Convert HES APC - 2015 to 2018
-                base_parameters:
-                  year: "{{input}}"
-                source: GIT
-              job_cluster_key: nhp_job_cluster
-        - task_key: Bronze-201920-202021
-          for_each_task:
-            inputs: "[2019, 2020]"
-            task:
-              task_key: Bronze-201920-202021_iteration
-              notebook_task:
-                notebook_path: apc/bronze/Convert HES APC - 2019 to 2020
-                base_parameters:
-                  year: "{{input}}"
-                source: GIT
-              job_cluster_key: nhp_job_cluster
-        - task_key: Bronze-202122-202223
-          for_each_task:
-            inputs: "[2021, 2022]"
-            task:
-              task_key: Bronze-202122-202223_iteration
-              notebook_task:
-                notebook_path: apc/bronze/Convert HES APC - 2021 to 2022
-                base_parameters:
-                  year: "{{input}}"
+              task_key: Bronze-iteration
+              spark_python_task:
+                python_file: apc/bronze/load_apc_data.py
+                parameters:
+                  - "{{input}}"
                 source: GIT
               job_cluster_key: nhp_job_cluster
         - task_key: Silver-Episodes
           depends_on:
-            - task_key: Bronze-201516-201819
-            - task_key: Bronze-202122-202223
-            - task_key: Bronze-199798-201213
-            - task_key: Bronze-201314-201415
-            - task_key: Bronze-201920-202021
-            - task_key: Bronze-198990-199697
+            - task_key: Bronze-loop
           notebook_task:
             notebook_path: apc/silver/Process HES APC (Episodes)
             source: GIT
@@ -137,24 +75,33 @@ resources:
           new_cluster:
             cluster_name: ""
             spark_version: 14.3.x-scala2.12
+            spark_conf:
+              spark.sql.shuffle.partitions: auto
             azure_attributes:
               first_on_demand: 1
               availability: SPOT_WITH_FALLBACK_AZURE
               spot_bid_max_price: -1
-            node_type_id: Standard_D8ads_v5
+            node_type_id: Standard_E16as_v4
             custom_tags:
               project: nhp
             enable_elastic_disk: true
             data_security_mode: SINGLE_USER
-            runtime_engine: STANDARD
+            runtime_engine: PHOTON
             autoscale:
               min_workers: 2
               max_workers: 8
       git_source:
         git_url: https://github.com/The-Strategy-Unit/hes_processing
         git_provider: gitHub
-        git_branch: main
+        git_branch: add_older_ip_notebooks
       tags:
         group: hes_data
       queue:
         enabled: true
+      parameters:
+        - name: bronze_years
+          default:
+            "[1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+            2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+            2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021,
+            2022, 2023]"
