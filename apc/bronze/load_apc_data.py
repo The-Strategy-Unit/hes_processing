@@ -7,7 +7,7 @@ import sys
 from apc.bronze.get_apc_csv_data import get_apc_csv_data
 from apc.bronze.get_apc_parquet_data import get_apc_parquet_data
 
-TABLE = "su_data.hes.bronze"
+TABLE = "hes.bronze.apc"
 
 def load_apc_data(spark: SparkContext, year: int) -> None:
     fyear = year * 100 + ((year + 1) % 100)
