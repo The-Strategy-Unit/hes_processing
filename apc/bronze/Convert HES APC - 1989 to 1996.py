@@ -25,12 +25,18 @@ fyear = year * 100 + ((year + 1) % 100)
 filepath = "/Volumes/su_data/default/hes_raw/apc/"
 filename = f"{filepath}/apc_{fyear}"
 
-savepath = f"/Volumes/hes/bronze/raw/apc/fyear={fyear}"
-
 # COMMAND ----------
 
-if os.path.exists(savepath):
-    dbutils.notebook.exit("data already exists: skipping")
+try:
+    previously_run = (
+        spark.read.table("hes.bronze.apc")
+        .filter(F.col("fyear") == fyear)
+        .count()
+    ) > 1
+    if previously_run:
+        dbutils.notebook.exit("data already exists: skipping")
+except:
+    pass
 
 # COMMAND ----------
 
@@ -486,9 +492,12 @@ df = (
 # COMMAND ----------
 
 (
-    df.select(*sorted(df.columns))
+    df.withColumn("fyear", F.lit(fyear))
+    .select(*sorted(df.columns))
     .repartition(32)
     .write
+    .option("mergeSchema", "true")
+    .mode("append")
     .mode("overwrite")
-    .parquet(savepath)
+    .saveAsTable("hes.bronze.apc")
 )

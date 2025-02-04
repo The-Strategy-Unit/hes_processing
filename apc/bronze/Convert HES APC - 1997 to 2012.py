@@ -26,12 +26,18 @@ filepath = "/Volumes/su_data/default/hes_raw/apc/"
 filename = f"{filepath}/apc_{fyear}"
 mpsid_file = f"{filepath}/apc_{fyear}_mpsid.parquet"
 
-savepath = f"/Volumes/hes/bronze/raw/apc/fyear={fyear}"
-
 # COMMAND ----------
 
-if os.path.exists(savepath):
-    dbutils.notebook.exit("data already exists: skipping")
+try:
+    previously_run = (
+        spark.read.table("hes.bronze.apc")
+        .filter(F.col("fyear") == fyear)
+        .count()
+    ) > 1
+    if previously_run:
+        dbutils.notebook.exit("data already exists: skipping")
+except:
+    pass
 
 # COMMAND ----------
 
@@ -488,7 +494,7 @@ df = (
 # some of the epikeys are broken and need to be fixed
 if 1997 <= year < 2012:
     to_add = ((year % 100) + 100) * int(1e9)
-    df = df.withColumn("epikey", F.col("epikey") + F.lit(to_add))
+    df = df.withColumn("epikey", (F.col("epikey").cast("long") + F.lit(to_add)).cast("string"))
 
 mpsid = (
     spark.read.parquet(mpsid_file)
@@ -507,9 +513,12 @@ df = df.join(mpsid, "epikey", "left")
 # COMMAND ----------
 
 (
-    df.select(*sorted(df.columns))
+    df.withColumn("fyear", F.lit(fyear))
+    .select(*sorted(df.columns))
     .repartition(32)
     .write
+    .option("mergeSchema", "true")
+    .mode("append")
     .mode("overwrite")
-    .parquet(savepath)
+    .saveAsTable("hes.bronze.apc")
 )
