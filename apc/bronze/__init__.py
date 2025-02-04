@@ -1,6 +1,8 @@
 from functools import reduce
 from pyspark import SparkContext
 from pyspark.sql import DataFrame, functions as F, types as T
+from databricks.connect import DatabricksSession
+import sys
 
 from apc.bronze.schemas import columns
 
@@ -53,9 +55,12 @@ def _load_apc_csv_data(spark: SparkContext, year: int) -> None:
 
         df = df.join(dismeth, "epikey", "left")
     
+    # add fyear
+    df = df.withColumn("fyear", F.lit(fyear))
+
     # save data
     (
-        df.withColumn("fyear", F.lit(fyear))
+        df
         .select(*sorted(df.columns))
         .repartition(32)
         .write
@@ -123,8 +128,11 @@ def _load_apc_parquet_data(spark: SparkContext, year: int) -> None:
         df
     )
 
+    # add fyear
+    df = df.withColumn("fyear", F.lit(fyear))
+
     (
-        df.withColumn("fyear", F.lit(fyear))
+        df
         .select(*sorted(df.columns))
         .repartition(32)
         .write
@@ -138,3 +146,8 @@ def load_apc_data(spark: SparkContext, year: int) -> None:
         _load_apc_parquet_data(spark, year)
     else:
         _load_apc_csv_data(spark, year)
+
+if __name__ == "__main__":
+    spark = DatabricksSession.builder.getOrCreate()
+    year = sys.argv[1]
+    load_apc_data(spark, year)
