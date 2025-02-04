@@ -141,6 +141,7 @@ df = (
     df
     .repartition("procode3")
     .write
+    .option("mergeSchema", "true")
     .mode("overwrite")
     .partitionBy(["fyear", "procode3", "last_episode_in_spell"])
     .saveAsTable("hes.silver.apc")
