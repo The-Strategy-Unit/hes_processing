@@ -516,6 +516,5 @@ df = df.join(mpsid, "epikey", "left")
     .write
     .option("mergeSchema", "true")
     .mode("append")
-    .mode("overwrite")
     .saveAsTable("hes.bronze.apc")
 )

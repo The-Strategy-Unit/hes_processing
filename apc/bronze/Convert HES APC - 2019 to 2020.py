@@ -199,7 +199,7 @@ csv_schema = StructType([
     StructField('disdate', DateType(), True),
     StructField('disdest', StringType(), True),
     StructField('disreadydate', DateType(), True),
-    StructField('dob_cfl', StringType(), True),
+    StructField('dob_cfl', IntegerType(), True),
     StructField('earldatoff', DateType(), True),
     StructField('elecdate', DateType(), True),
     StructField('elecdur', IntegerType(), True),
@@ -441,6 +441,5 @@ df = df.join(dismeth, "epikey", "left")
     .write
     .option("mergeSchema", "true")
     .mode("append")
-    .mode("overwrite")
     .saveAsTable("hes.bronze.apc")
 )

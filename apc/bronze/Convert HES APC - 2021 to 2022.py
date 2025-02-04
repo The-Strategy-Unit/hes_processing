@@ -132,6 +132,5 @@ df = reduce(
     .write
     .option("mergeSchema", "true")
     .mode("append")
-    .mode("overwrite")
     .saveAsTable("hes.bronze.apc")
 )
