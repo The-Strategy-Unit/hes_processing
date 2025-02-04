@@ -86,7 +86,7 @@ resources:
               project: nhp
             enable_elastic_disk: true
             data_security_mode: SINGLE_USER
-            runtime_engine: PHOTON
+            runtime_engine: STANDARD
             autoscale:
               min_workers: 2
               max_workers: 8
