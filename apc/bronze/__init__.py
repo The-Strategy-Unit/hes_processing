@@ -149,5 +149,5 @@ def load_apc_data(spark: SparkContext, year: int) -> None:
 
 if __name__ == "__main__":
     spark = DatabricksSession.builder.getOrCreate()
-    year = sys.argv[1]
+    year = int(sys.argv[1])
     load_apc_data(spark, year)
