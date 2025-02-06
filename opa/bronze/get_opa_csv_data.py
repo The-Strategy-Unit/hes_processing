@@ -12,12 +12,13 @@ def get_opa_csv_data(spark: SparkContext, year: int) -> DataFrame:
     fyear = year * 100 + ((year + 1) % 100)
 
     filepath = f"/Volumes/su_data/default/hes_raw/opa/opa_{fyear}"
-    filename = f"{filepath}/opa_{fyear}"
 
     sep = "|" if year < 2019 else ","
     csv_schema = create_schema(f"{filepath}/opa_{fyear}_headers.txt", sep)
 
-    df: DataFrame = spark.read.csv(filename, header=False, schema=csv_schema, sep=sep)
+    df: DataFrame = spark.read.csv(
+        f"{filepath}/data", header=False, schema=csv_schema, sep=sep
+    )
 
     # join in mpsid file
     if year <= 2018:
