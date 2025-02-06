@@ -22,7 +22,7 @@ def get_ae_csv_data(spark: SparkContext, year: int) -> DataFrame:
 
     # join in mpsid file
     if year <= 2018:
-        mpsid_file = f"{filepath}/aae_{fyear}_mpsid.parquet"
+        mpsid_file = f"{filepath}/ae_{fyear}_mpsid.parquet"
 
         if 1997 <= year < 2012:
             to_add = ((year % 100) + 200) * int(1e9)
