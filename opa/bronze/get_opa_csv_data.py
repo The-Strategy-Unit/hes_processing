@@ -38,7 +38,7 @@ def get_opa_csv_data(spark: SparkContext, year: int) -> DataFrame:
         df = df.join(mpsid, "attendkey", "left")
 
     if "1stoperation" in df.columns:
-        df = df.drop("1stoperation")
+        df = df.withColumnRenamed("1stoperation", "opertn_01")
 
     if year >= 2019:
         df = df.drop(
