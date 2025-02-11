@@ -11,13 +11,14 @@ def get_apc_csv_data(spark: SparkContext, year: int) -> DataFrame:
     """Get APC (CSV) data"""
     fyear = year * 100 + ((year + 1) % 100)
 
-    filepath = "/Volumes/su_data/default/hes_raw/apc/"
-    filename = f"{filepath}/apc_{fyear}"
+    filepath = f"/Volumes/su_data/default/hes_raw/apc/apc_{fyear}"
 
     sep = "|" if year < 2019 else ","
-    csv_schema = create_schema(f"{filename}_headers.txt", sep)
+    csv_schema = create_schema(f"{filepath}/apc_{fyear}_headers.txt", sep)
 
-    df: DataFrame = spark.read.csv(filename, header=False, schema=csv_schema, sep=sep)
+    df: DataFrame = spark.read.csv(
+        f"{filepath}/data", header=False, schema=csv_schema, sep=sep
+    )
 
     # join in mpsid file
     if 1997 <= year <= 2018:
