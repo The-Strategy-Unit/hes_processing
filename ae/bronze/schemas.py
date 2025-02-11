@@ -270,6 +270,6 @@ def create_schema(file: str, sep: str) -> T.StructType:
     """create csv schema"""
     with open(file, "r", encoding="UTF-8") as f:
         cols = f.read().lower().split(sep)
-    cols = [re.sub("_$", "_02", re.sub("_(\d)$", "_0\\1", i)) for i in cols]
+    cols = [re.sub("_$", "_02", re.sub(r"_(\d)$", r"_0\1", i)) for i in cols]
 
     return T.StructType([T.StructField(c, ALL_COLUMNS[c], True) for c in cols])
