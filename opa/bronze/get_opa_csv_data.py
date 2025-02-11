@@ -24,8 +24,8 @@ def get_opa_csv_data(spark: SparkContext, year: int) -> DataFrame:
     if year <= 2018:
         mpsid_file = f"{filepath}/opa_{fyear}_mpsid.parquet"
 
-        if year < 2012:
-            to_add = ((year % 100) + 300) * int(1e9)
+        if year <= 2012:
+            to_add = (300 + (year % 100)) * int(1e9)
             df = df.withColumn(
                 "attendkey",
                 (F.col("attendkey").cast("long") + F.lit(to_add)).cast("string"),

@@ -24,8 +24,8 @@ def get_ae_csv_data(spark: SparkContext, year: int) -> DataFrame:
     if year <= 2018:
         mpsid_file = f"{filepath}/ae_{fyear}_mpsid.parquet"
 
-        if 1997 <= year < 2012:
-            to_add = ((year % 100) + 200) * int(1e9)
+        if year <= 2012:
+            to_add = (200 + (year % 100)) * int(1e9)
             df = df.withColumn(
                 "aekey", (F.col("aekey").cast("long") + F.lit(to_add)).cast("string")
             )

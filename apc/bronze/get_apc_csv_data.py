@@ -23,8 +23,9 @@ def get_apc_csv_data(spark: SparkContext, year: int) -> DataFrame:
     if 1997 <= year <= 2018:
         mpsid_file = f"{filepath}/apc_{fyear}_mpsid.parquet"
 
-        if 1997 <= year < 2012:
-            to_add = ((year % 100) + 100) * int(1e9)
+        # aae/opa is <=, apc is <
+        if year < 2012:
+            to_add = (100 + (year % 100)) * int(1e9)
             df = df.withColumn(
                 "epikey", (F.col("epikey").cast("long") + F.lit(to_add)).cast("string")
             )
