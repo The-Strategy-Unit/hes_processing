@@ -38,6 +38,16 @@ df = df.drop(
             f"{c}_{i}"
             for i in range(1, 10)
             for c in [
+                "acpdisp",
+                "acpdqind",
+                "acpend",
+                "acploc",
+                "acpn",
+                "acpout",
+                "acpplan",
+                "acpsour",
+                "acpspef",
+                "acpstar",
                 "biresus",
                 "birordr",
                 "birstat",
@@ -45,7 +55,10 @@ df = df.drop(
                 "delmeth",
                 "delplac",
                 "delstat",
+                "depdays",
                 "gestat",
+                "intdays",
+                "orgsup",
                 "sexbaby"
             ]
         ] + [
@@ -56,7 +69,7 @@ df = df.drop(
             for c in ["opdate", "opertn"]
         ] +
         # drop other columns
-        ["alcdiag_4", "cause_3", "cause_4"]
+        ["alcdiag_4", "cause_3", "cause_4", "diag3_01", "diag4_01", "opertn3_01"]
     )
 )
 
@@ -141,6 +154,7 @@ df = (
     df
     .repartition("procode3")
     .write
+    .option("mergeSchema", "true")
     .mode("overwrite")
     .partitionBy(["fyear", "procode3", "last_episode_in_spell"])
     .saveAsTable("hes.silver.apc")
