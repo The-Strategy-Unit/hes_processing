@@ -490,6 +490,9 @@ ALL_COLUMNS = {
     "ward91": T.StringType(),
     "wardstrt": T.StringType(),
     "well_baby_ind": T.StringType(),
+    # these get renamed to lsoa01/msoa01, except in 2013/14 we have both soal and lsoa01
+    "soal": T.StringType(),
+    "soam": T.StringType(),
 }
 
 
@@ -501,9 +504,11 @@ def create_schema(file: str, sep: str) -> T.StructType:
     for i, c in enumerate(cols):
         match c:
             case "soal":
-                cols[i] = "lsoa01"
+                if "lsoa01" not in cols:
+                    cols[i] = "lsoa01"
             case "soam":
-                cols[i] = "msoa01"
+                if "msoa01" not in cols:
+                    cols[i] = "msoa01"
             case "my_dob":
                 cols[i] = "mydob"
             case "pctorgig02":
