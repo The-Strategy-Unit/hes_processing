@@ -255,8 +255,6 @@ ALL_COLUMNS = {
     "servtype": T.StringType(),
     "sex": T.StringType(),
     "sitetret": T.StringType(),
-    "soal": T.StringType(),
-    "soam": T.StringType(),
     "stafftyp": T.StringType(),
     "sthatret": T.StringType(),
     "subdate": T.DateType(),
@@ -277,5 +275,12 @@ def create_schema(file: str, sep: str) -> T.StructType:
     """create csv schema"""
     with open(file, "r", encoding="UTF-8") as f:
         cols = f.read().lower().split(sep)
+
+    for i, c in enumerate(cols):
+        match c:
+            case "soal":
+                cols[i] = "lsoa01"
+            case "soam":
+                cols[i] = "msoa01"
 
     return T.StructType([T.StructField(c, ALL_COLUMNS[c], True) for c in cols])

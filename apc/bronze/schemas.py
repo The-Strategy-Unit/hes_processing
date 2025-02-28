@@ -470,8 +470,6 @@ ALL_COLUMNS = {
     "sexbaby_8": T.StringType(),
     "sexbaby_9": T.StringType(),
     "sitetret": T.StringType(),
-    "soal": T.StringType(),
-    "soam": T.StringType(),
     "spelbgin": T.IntegerType(),
     "speldur": T.IntegerType(),
     "spelend": T.StringType(),
@@ -502,6 +500,10 @@ def create_schema(file: str, sep: str) -> T.StructType:
 
     for i, c in enumerate(cols):
         match c:
+            case "soal":
+                cols[i] = "lsoa01"
+            case "soam":
+                cols[i] = "msoa01"
             case "my_dob":
                 cols[i] = "mydob"
             case "pctorgig02":

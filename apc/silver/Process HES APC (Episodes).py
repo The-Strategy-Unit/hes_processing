@@ -1,10 +1,8 @@
 # Databricks notebook source
-from pyspark.sql import functions as F
-from pyspark.sql import DataFrame, Window
-
 from databricks.sdk.runtime import *
-
 from fix_icd10_or_opcs4 import fix_icd10_or_opcs4
+from pyspark.sql import DataFrame, Window
+from pyspark.sql import functions as F
 
 # COMMAND ----------
 
@@ -59,15 +57,12 @@ df = df.drop(
                 "gestat",
                 "intdays",
                 "orgsup",
-                "sexbaby"
+                "sexbaby",
             ]
-        ] + [
-            f"diag_{i:02}" for i in range(1, 21)
-        ] + [
-            f"{c}_{i:02}"
-            for i in range(1, 25)
-            for c in ["opdate", "opertn"]
-        ] +
+        ]
+        + [f"diag_{i:02}" for i in range(1, 21)]
+        + [f"{c}_{i:02}" for i in range(1, 25) for c in ["opdate", "opertn"]]
+        +
         # drop other columns
         ["alcdiag_4", "cause_3", "cause_4", "diag3_01", "diag4_01", "opertn3_01"]
     )
@@ -76,13 +71,44 @@ df = df.drop(
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Drop the IMD column
+# MAGIC ## Recreate the IMD decile
 # MAGIC
-# MAGIC The imd columns are fixed as imd04 - it would be more useful to join to the relevant imd files later on as needed.
 
 # COMMAND ----------
 
-df = df.drop(*[i for i in df.columns if i.startswith("imd")])
+# IMD04 on activity up to and including 2006-07
+# IMD07 on activity between 2007-08 and 2009-10
+# IMD10 on activity from 2010-11 and M10 2022-23
+# IMD19 from M11 2022-23
+
+imdrk_to_ntile = (
+    df.select("fyear", "imd04rk")
+    .filter(F.col("imd04rk").isNotNull())
+    .distinct()
+    .withColumn(
+        "imd_decile", F.ntile(10).over(Window.partitionBy("fyear").orderBy("imd04rk"))
+    )
+    .withColumn(
+        "imd_quintile",
+        F.ntile(5).over(Window.partitionBy("fyear").orderBy("imd04rk")),
+    )
+)
+
+df = (
+    df.drop("imd04_decile")
+    .join(imdrk_to_ntile, ["fyear", "imd04rk"], "left")
+    .withColumn(
+        "imd_version",
+        F.when(F.col("imd04rk").isNull(), F.col(None).cast("string")).when(
+            F.col("fyear") >= 202324, F.lit("IMD19")
+        )
+        # change happened in M10 2022/23, e.g. January 2023
+        .when(F.year(F.col("admidate")) == 2023, F.lit("IMD19"))
+        .when(F.col("fyear") >= 201011, F.lit("IMD10"))
+        .when(F.col("fyear") >= 200708, F.lit("IMD07"))
+        .otherwise(F.lit("IMD04")),
+    )
+)
 
 # COMMAND ----------
 
@@ -111,36 +137,25 @@ df = df.drop(*[i for i in df.columns if i.startswith("imd")])
 
 # COMMAND ----------
 
-w = (
-    Window
-    .partitionBy(["susspellid"])
-    .orderBy(F.desc("epistart"), F.desc("epiorder"), F.desc("epiend"), F.desc("epikey"))
+w = Window.partitionBy(["susspellid"]).orderBy(
+    F.desc("epistart"), F.desc("epiorder"), F.desc("epiend"), F.desc("epikey")
 )
 
 last_episode_in_spell = (
-    df
-    .filter(F.col("epistat") == 3)
+    df.filter(F.col("epistat") == 3)
     .filter(F.col("admidate").isNotNull())
     .filter(F.col("dismeth") != "8")
     .filter(F.col("disdate").isNotNull())
     .filter(F.col("susspellid") != "-1")
     .filter(F.col("susspellid").isNotNull())
-    .withColumn(
-        "p_rev_spell_epiorder",
-        F.row_number().over(w)
-    )
+    .withColumn("p_rev_spell_epiorder", F.row_number().over(w))
     .filter(F.col("p_rev_spell_epiorder") == 1)
     .select("epikey")
-    .withColumn(
-        "last_episode_in_spell",
-        F.lit(True)
-    )
+    .withColumn("last_episode_in_spell", F.lit(True))
 )
-    
-df = (
-    df
-    .join(last_episode_in_spell, "epikey", "left")
-    .na.fill(False, ["last_episode_in_spell"])
+
+df = df.join(last_episode_in_spell, "epikey", "left").na.fill(
+    False, ["last_episode_in_spell"]
 )
 
 # COMMAND ----------
@@ -151,10 +166,9 @@ df = (
 # COMMAND ----------
 
 (
-    df
+    df.select(*sorted(df.columns))
     .repartition("procode3")
-    .write
-    .option("mergeSchema", "true")
+    .write.option("mergeSchema", "true")
     .mode("overwrite")
     .partitionBy(["fyear", "procode3", "last_episode_in_spell"])
     .saveAsTable("hes.silver.apc")
