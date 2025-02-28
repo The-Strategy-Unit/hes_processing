@@ -56,6 +56,10 @@ def get_opa_csv_data(spark: SparkContext, year: int) -> DataFrame:
             ]
         )
 
+    # remove the soal/soam columns if they haven't been remaped to lsoa01/msoa01
+    if "soal" in df.columns:
+        df = df.drop("soal", "soam")
+
     # add fyear
     df = df.withColumn("fyear", F.lit(fyear))
 

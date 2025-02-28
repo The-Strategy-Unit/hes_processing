@@ -261,6 +261,9 @@ ALL_COLUMNS = {
     "trettime": T.StringType(),
     "waitdays": T.IntegerType(),
     "ward91": T.StringType(),
+    # these get renamed to lsoa01/msoa01, except in 2013/14 we have both soal and lsoa01
+    "soal": T.StringType(),
+    "soam": T.StringType(),
 }
 
 
@@ -274,8 +277,10 @@ def create_schema(file: str, sep: str) -> T.StructType:
     for i, c in enumerate(cols):
         match c:
             case "soal":
-                cols[i] = "lsoa01"
+                if "lsoa01" not in cols:
+                    cols[i] = "lsoa01"
             case "soam":
-                cols[i] = "msoa01"
+                if "msoa01" not in cols:
+                    cols[i] = "msoa01"
 
     return T.StructType([T.StructField(c, ALL_COLUMNS[c], True) for c in cols])
