@@ -58,7 +58,7 @@ df = (
             F.col("fyear") >= 202324, F.lit("IMD19")
         )
         # change happened in M10 2022/23, e.g. January 2023
-        .when(F.year(F.col("admidate")) == 2023, F.lit("IMD19"))
+        .when(F.year(F.col("arrivaldate")) == 2023, F.lit("IMD19"))
         .when(F.col("fyear") >= 201011, F.lit("IMD10"))
         .when(F.col("fyear") >= 200708, F.lit("IMD07"))
         .otherwise(F.lit("IMD04")),
