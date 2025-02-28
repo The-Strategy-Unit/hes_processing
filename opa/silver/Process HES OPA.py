@@ -55,7 +55,7 @@ df = (
     .join(imdrk_to_ntile, ["fyear", "imd04rk"], "left")
     .withColumn(
         "imd_version",
-        F.when(F.col("imd04rk").isNull(), F.col(None).cast("string")).when(
+        F.when(F.col("imd04rk").isNull(), F.lit(None).cast("string")).when(
             F.col("fyear") >= 202324, F.lit("IMD19")
         )
         # change happened in M10 2022/23, e.g. January 2023
