@@ -10,5 +10,3 @@ This directory contains scripts and related files for processing Hospital Episod
 The top level `.yaml` files define the databricks workflows. 
 
 The three folders contain the bronze and silver layer processing scripts for inpatients (`apc`), outpatients (`opc`) and A&E (`aae`).
-
-The repository is part of the [New Hospital Programme model project](https://connect.strategyunitwm.nhs.uk/nhp/project_information/).
