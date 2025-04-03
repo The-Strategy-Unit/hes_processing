@@ -12,7 +12,7 @@ def get_apc_parquet_data(spark: SparkContext, year: int) -> DataFrame:
     """Get APC (parquet) data"""
     fyear = year * 100 + ((year + 1) % 100)
 
-    filepath = "/Volumes/su_data/default/nhp_hes_apc/"
+    filepath = "abfss://nhse-nhp-data@sudata.dfs.core.windows.net/NHP_HES/NHP_HESAPC/"
 
     if year >= 2023:
         filepath += "/FY2023-24/"
