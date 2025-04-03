@@ -46,6 +46,20 @@ def get_apc_csv_data(spark: SparkContext, year: int) -> DataFrame:
 
         df = df.join(dismeth, "epikey", "left")
 
+    # recalculate resladst_ons/resgor_ons
+    if 2009 <= year <= 2014:
+        resladst_lkup = (
+            spark.read.table("strategyunit.reference.resladst_to_resladst_ons_lookup")
+            .filter(F.col("year") == year)
+            .drop("year")
+        )
+        df = df.join(resladst_lkup, "resladst", "left")
+
+        resgor_lkup = spark.read.table(
+            "strategyunit.reference.resgor_to_resgor_ons_lookup"
+        )
+        df = df.join(resgor_lkup, "resgor", "left")
+
     # remove the soal/soam columns if they haven't been remaped to lsoa01/msoa01
     if "soal" in df.columns:
         df = df.drop("soal", "soam")
