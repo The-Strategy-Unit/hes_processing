@@ -11,7 +11,7 @@ def get_ae_csv_data(spark: SparkContext, year: int) -> DataFrame:
     """Get A&E (CSV) data"""
     fyear = year * 100 + ((year + 1) % 100)
 
-    filepath = f"/Volumes/su_data/default/hes_raw/ae/ae_{fyear}"
+    filepath = f"/Volumes/hes/bronze/files/ae/ae_{fyear}"
 
     sep = "|" if year < 2019 else ","
     csv_schema = create_schema(f"{filepath}/ae_{fyear}_headers.txt", sep)
