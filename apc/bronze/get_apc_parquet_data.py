@@ -78,4 +78,26 @@ def get_apc_parquet_data(spark: SparkContext, year: int) -> DataFrame:
     # add fyear
     df = df.withColumn("fyear", F.lit(fyear))
 
+    # add maternity_episode_type
+    df_mat_episode_type = (
+        df.filter(F.col("epistat") == "3")
+        .filter(F.col("classpat").isin(1, 2, 5))
+        .filter(F.col("delmeth_1").isNotNull())
+        .withColumn(
+            "maternity_episode_type",
+            F.when(
+                F.col("epitype").isin(2, 5),
+                F.when(F.col("delplac_1").isin(1, 5, 6), 3).otherwise(1),
+            )
+            .when(
+                F.col("epitype").isin(3, 6),
+                F.when(F.col("delplac_1").isin(1, 5, 6), 4).otherwise(2),
+            )
+            .otherwise("9"),
+        )
+        .select("epikey", "maternity_episode_type")
+    )
+
+    df = df.join(df_mat_episode_type, "epikey", "left")
+
     return df
